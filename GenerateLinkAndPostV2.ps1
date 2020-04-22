@@ -113,17 +113,16 @@ $courses = Get-ChildItem -Path $FilePath -Name
 #For each item in the list
 foreach($course in $courses)
 {
+#First need to get the file name. To do this we need to export the link(-a) and the -f flag to auto-accept the copyright notice
+$FileName = Split-Path -Path $Filepath\$course -Leaf
+$ExportedLink = mega-export -a -f  $FileName
+$ShortLink = $ExportedLink.Split(":",2)[1]    
+#Next, we need to encode it.
+$sEncodedString=[Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($ShortLink))
+
     #if the item is not the link file
     if ($course -ne "links.txt")
     {
-        #Take the folder path and get just the folder name
-        $FileName = Split-Path -Path $Filepath -Leaf
-        $ExportedLink = mega-export -a -f  $FileName
-        $ShortLink = $ExportedLink.Split(":",2)[1]
-            
-        #Next, we need to encode it.
-        $sEncodedString=[Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($ShortLink))
-
         #Take the link and put it in a variable with the course name
         $courseInfo = $course  + " || " + $sEncodedString
 
